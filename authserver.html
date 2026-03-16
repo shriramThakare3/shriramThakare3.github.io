@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#fafafa;--surface:#fff;--border:#e8e8e8;--border2:#d4d4d4;
+  --text:#3b3b3b;--muted:#6f6f6f;--light:#a0a0a0;
+  --get:#0d6aad;--get-bg:#e8f3fb;--get-bdr:#b6d9f0;
+  --post:#1a7a4a;--post-bg:#e8f7f0;--post-bdr:#9dd8bb;
+  --del:#c0392b;--del-bg:#fdf0ef;--del-bdr:#f0b8b3;
+  --patch:#7d5a00;--patch-bg:#fdf7e8;--patch-bdr:#e8d496;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;}
+a{color:#1a56db;text-decoration:none;}a:hover{text-decoration:underline;}
+/* top bar */
+.topbar{background:#1a1a18;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{color:#fff;font-family:var(--mono);font-size:13px;font-weight:600;}
+.topbar-back{color:#9b9b94;font-family:var(--mono);font-size:11px;text-decoration:none;}
+.topbar-back:hover{color:#fff;text-decoration:none;}
+/* info block */
+.info-block{background:var(--surface);border-bottom:1px solid var(--border);padding:24px 32px;}
+.api-title{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.api-version{display:inline-block;font-family:var(--mono);font-size:11px;background:#e0e0e0;color:#555;padding:2px 8px;border-radius:10px;margin-bottom:12px;}
+.api-desc{font-size:13px;color:var(--muted);max-width:640px;line-height:1.6;margin-bottom:16px;}
+.base-url{font-family:var(--mono);font-size:12px;color:var(--muted);}
+.base-url span{color:var(--text);}
+/* section */
+.section{margin:16px 24px;}
+.section-tag{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);background:#f0f0f0;border:1px solid var(--border);border-radius:4px 4px 0 0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.section-tag:hover{background:#e8e8e8;}
+.section-body{border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;overflow:hidden;}
+/* endpoint row */
+.ep{border-bottom:1px solid var(--border);overflow:hidden;}
+.ep:last-child{border-bottom:none;}
+.ep-header{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;transition:background 0.1s;}
+.ep-header:hover{background:#f8f8f8;}
+.ep.open .ep-header{border-bottom:1px solid var(--border);}
+.method{font-family:var(--mono);font-size:11px;font-weight:600;padding:3px 10px;border-radius:3px;min-width:64px;text-align:center;}
+.GET   {color:var(--get);background:var(--get-bg);border:1px solid var(--get-bdr);}
+.POST  {color:var(--post);background:var(--post-bg);border:1px solid var(--post-bdr);}
+.DELETE{color:var(--del);background:var(--del-bg);border:1px solid var(--del-bdr);}
+.PATCH {color:var(--patch);background:var(--patch-bg);border:1px solid var(--patch-bdr);}
+.ep-path{font-family:var(--mono);font-size:13px;color:var(--text);}
+.ep-summary{font-size:13px;color:var(--muted);margin-left:auto;}
+.ep-body{background:#fafafa;padding:20px 24px;display:none;}
+.ep.open .ep-body{display:block;}
+/* params/body tables */
+.ep-section-label{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--light);margin-bottom:10px;margin-top:16px;}
+.ep-section-label:first-child{margin-top:0;}
+.params-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px;}
+.params-table th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--light);text-transform:uppercase;letter-spacing:0.08em;padding:6px 12px;background:#f0f0f0;border:1px solid var(--border);}
+.params-table td{padding:8px 12px;border:1px solid var(--border);background:#fff;vertical-align:top;}
+.params-table td:first-child{font-family:var(--mono);font-size:12px;color:var(--text);}
+.required{color:var(--del);font-size:10px;margin-left:4px;}
+.type-badge{font-family:var(--mono);font-size:10px;background:#f0f0f0;color:var(--muted);padding:1px 6px;border-radius:3px;}
+.code-block{background:#1e1e1e;color:#d4d4d4;font-family:var(--mono);font-size:12px;padding:14px 16px;border-radius:4px;line-height:1.6;overflow-x:auto;margin-top:4px;}
+.code-block .k{color:#9cdcfe;}
+.code-block .s{color:#ce9178;}
+.code-block .n{color:#b5cea8;}
+.code-block .c{color:#6a9955;}
+/* responses */
+.response-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.response-row:last-child{border-bottom:none;}
+.resp-code{font-family:var(--mono);font-size:12px;font-weight:600;min-width:48px;}
+.resp-200{color:var(--post);}
+.resp-201{color:var(--post);}
+.resp-204{color:var(--post);}
+.resp-400{color:var(--patch);}
+.resp-401{color:var(--del);}
+.resp-404{color:var(--del);}
+.resp-413{color:var(--del);}
+.resp-desc{font-size:13px;color:var(--muted);}
+/* notice */
+.static-notice{background:#fffbeb;border:1px solid #f0d060;border-radius:4px;padding:10px 16px;font-size:12px;color:#7a5c00;margin-bottom:16px;font-family:var(--mono);}
+</style>
+</head>
+<body>
+<title>Authentication Server API — API Docs</title>
+<div class="topbar">
+  <span class="topbar-title">Authentication Server API</span>
+  <a class="topbar-back" href="../index.html">← Back to Portfolio</a>
+</div>
+<div class="info-block">
+  <div class="api-title">Authentication Server API</div>
+  <span class="api-version">1.0.0</span>
+  <div class="api-desc">JWT authentication backend. Register, login, and refresh tokens. Access tokens are short-lived (30 min); refresh tokens are long-lived (7 days), stored as SHA-256 hashes. Supports RBAC, token rotation with reuse detection, and per-session logout.</div>
+  <div class="base-url">Base URL: <span>http://localhost/</span> · <span style="color:#a0a0a0">Run locally with Docker Compose · <code style="font-family:var(--mono)">docker compose up --build</code></span></div>
+</div>
+<div class="section">
+  <div class="section-tag">auth — register, login, token management<span class="arrow">▼</span></div>
+  <div class="section-body"><div class="ep">
+  <div class="ep-header">
+    <span class="method POST">POST</span>
+    <span class="ep-path">/auth/register</span>
+    <span class="ep-summary">Register a new user</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Request Body</div><div class='code-block'>{
+  <span class="k">"username"</span>: <span class="s">"alice"</span>,         <span class="c">// 3-64 chars, [a-zA-Z0-9_-]</span>
+  <span class="k">"email"</span>: <span class="s">"alice@example.com"</span>,
+  <span class="k">"password"</span>: <span class="s">"secret123"</span>    <span class="c">// min 8 chars</span>
+}</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-201'>201</span><span class='resp-desc'>{ access_token, refresh_token, token_type: bearer, expires_in: 1800 }</span></div><div class='response-row'><span class='resp-code resp-409'>409</span><span class='resp-desc'>Username or email already registered.</span></div><div class='response-row'><span class='resp-code resp-422'>422</span><span class='resp-desc'>Validation error.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method POST">POST</span>
+    <span class="ep-path">/auth/login</span>
+    <span class="ep-summary">Login with credentials</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Request Body</div><div class='code-block'>{
+  <span class="k">"username"</span>: <span class="s">"alice"</span>,  <span class="c">// accepts username OR email</span>
+  <span class="k">"password"</span>: <span class="s">"secret123"</span>
+}</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{ access_token, refresh_token, token_type, expires_in }</span></div><div class='response-row'><span class='resp-code resp-401'>401</span><span class='resp-desc'>Invalid username or password. (Intentionally identical for wrong user vs wrong password — prevents enumeration.)</span></div><div class='response-row'><span class='resp-code resp-403'>403</span><span class='resp-desc'>Account is disabled.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method POST">POST</span>
+    <span class="ep-path">/auth/refresh</span>
+    <span class="ep-summary">Get new access token</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Request Body</div><div class='code-block'>{ <span class="k">"refresh_token"</span>: <span class="s">"eyJ..."</span> }</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{ access_token, token_type, expires_in }</span></div><div class='response-row'><span class='resp-code resp-401'>401</span><span class='resp-desc'>Token invalid, expired, revoked, or reuse detected. If reuse detected, entire token family is revoked.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method POST">POST</span>
+    <span class="ep-path">/auth/logout</span>
+    <span class="ep-summary">Logout — revoke refresh token</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Request Body</div><div class='code-block'>{ <span class="k">"refresh_token"</span>: <span class="s">"eyJ..."</span> }</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{ "message": "Logged out successfully." }</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method POST">POST</span>
+    <span class="ep-path">/auth/logout-all</span>
+    <span class="ep-summary">Logout all devices</span>
+  </div>
+  <div class="ep-body"><div class='static-notice'>⚠ Requires Authorization: Bearer &lt;access_token&gt; header.</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{ "message": "Logged out from N session(s)." }</span></div><div class='response-row'><span class='resp-code resp-401'>401</span><span class='resp-desc'>Invalid or expired access token.</span></div></div>
+</div></div>
+</div><div class="section">
+  <div class="section-tag">users — profile & admin<span class="arrow">▼</span></div>
+  <div class="section-body"><div class="ep">
+  <div class="ep-header">
+    <span class="method GET">GET</span>
+    <span class="ep-path">/users/me</span>
+    <span class="ep-summary">Get own profile</span>
+  </div>
+  <div class="ep-body"><div class='static-notice'>⚠ Requires Authorization: Bearer &lt;access_token&gt; header.</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{ id, username, email, role, is_active, created_at, updated_at }</span></div><div class='response-row'><span class='resp-code resp-401'>401</span><span class='resp-desc'>Token missing or invalid.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="ep-path">/users/me</span>
+    <span class="ep-summary">Update own profile</span>
+  </div>
+  <div class="ep-body"><div class='static-notice'>⚠ Requires Authorization: Bearer &lt;access_token&gt; header.</div><div class='ep-section-label'>Request Body</div><div class='code-block'>{
+  <span class="k">"username"</span>: <span class="s">"new_name"</span>,  <span class="c">// optional</span>
+  <span class="k">"email"</span>: <span class="s">"new@email.com"</span>  <span class="c">// optional</span>
+}</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>Updated profile.</span></div><div class='response-row'><span class='resp-code resp-409'>409</span><span class='resp-desc'>Username or email already taken.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method DELETE">DELETE</span>
+    <span class="ep-path">/users/me</span>
+    <span class="ep-summary">Deactivate own account</span>
+  </div>
+  <div class="ep-body"><div class='static-notice'>⚠ Requires Authorization: Bearer &lt;access_token&gt; header. Soft-delete — sets is_active=false.</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-204'>204</span><span class='resp-desc'>Account deactivated.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method GET">GET</span>
+    <span class="ep-path">/users</span>
+    <span class="ep-summary">List all users (admin only)</span>
+  </div>
+  <div class="ep-body"><div class='static-notice'>⚠ Requires admin role. Add Authorization: Bearer &lt;admin_access_token&gt; header.</div><div class='ep-section-label'>Parameters</div><table class='params-table'><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>search<span class='required'></span></td><td><span class='type-badge'>string</span></td><td>Search username or email</td></tr><tr><td>page<span class='required'></span></td><td><span class='type-badge'>integer</span></td><td>Page</td></tr><tr><td>limit<span class='required'></span></td><td><span class='type-badge'>integer</span></td><td>Per page (max 100)</td></tr></table><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{ total, page, limit, users: [...] }</span></div><div class='response-row'><span class='resp-code resp-403'>403</span><span class='resp-desc'>Admin privileges required.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method GET">GET</span>
+    <span class="ep-path">/users/{id}</span>
+    <span class="ep-summary">Get user by ID (admin only)</span>
+  </div>
+  <div class="ep-body"><div class='static-notice'>⚠ Requires admin role.</div><div class='ep-section-label'>Parameters</div><table class='params-table'><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>id<span class='required'>*</span></td><td><span class='type-badge'>string</span></td><td>User UUID</td></tr></table><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>User profile.</span></div><div class='response-row'><span class='resp-code resp-403'>403</span><span class='resp-desc'>Admin required.</span></div><div class='response-row'><span class='resp-code resp-404'>404</span><span class='resp-desc'>Not found.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="ep-path">/users/{id}/role</span>
+    <span class="ep-summary">Change user role (admin only)</span>
+  </div>
+  <div class="ep-body"><div class='static-notice'>⚠ Requires admin role.</div><div class='ep-section-label'>Request Body</div><div class='code-block'>{ <span class="k">"role"</span>: <span class="s">"admin"</span> }  <span class="c">// user | admin</span></div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>Updated profile.</span></div><div class='response-row'><span class='resp-code resp-403'>403</span><span class='resp-desc'>Admin required.</span></div><div class='response-row'><span class='resp-code resp-404'>404</span><span class='resp-desc'>Not found.</span></div></div>
+</div></div>
+</div><div class="section">
+  <div class="section-tag">system<span class="arrow">▼</span></div>
+  <div class="section-body"><div class="ep">
+  <div class="ep-header">
+    <span class="method GET">GET</span>
+    <span class="ep-path">/health</span>
+    <span class="ep-summary">Liveness + DB check</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{"status":"ok","version":"1.0.0"}</span></div></div>
+</div></div>
+</div>
+
+<script>
+document.querySelectorAll('.ep-header').forEach(h=>{
+  h.addEventListener('click',()=>{
+    h.closest('.ep').classList.toggle('open');
+  });
+});
+document.querySelectorAll('.section-tag').forEach(t=>{
+  t.addEventListener('click',()=>{
+    const body=t.nextElementSibling;
+    body.style.display=body.style.display==='none'?'':'none';
+    t.querySelector('.arrow').textContent=body.style.display==='none'?'▶':'▼';
+  });
+});
+</script>
+</body></html>

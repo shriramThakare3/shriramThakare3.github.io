@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shriram Thakare — Backend Developer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Root ─────────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0A0D14;
+      --bg2:      #0F1420;
+      --bg3:      #141928;
+      --surface:  #1A2035;
+      --border:   #232b42;
+      --accent:   #4F8EF7;
+      --accent2:  #7EC8E3;
+      --green:    #3DD68C;
+      --orange:   #F79A4F;
+      --red:      #F76F6F;
+      --text:     #E8EDF7;
+      --muted:    #7A8BA8;
+      --faint:    #3A4A65;
+      --mono:     'DM Mono', monospace;
+      --display:  'Syne', sans-serif;
+      --body:     'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--body);
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Noise overlay ────────────────────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── Nav ──────────────────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 40px;
+      height: 56px;
+      background: rgba(10,13,20,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+    }
+
+    .nav-links {
+      display: flex; gap: 32px; list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-status {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    /* ── Layout ───────────────────────────────────────────────────────────── */
+    main { padding-top: 56px; }
+
+    section {
+      position: relative; z-index: 1;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 80px 40px;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────────────────────── */
+    #hero {
+      min-height: calc(100vh - 56px);
+      display: flex; flex-direction: column; justify-content: center;
+      padding-top: 100px;
+    }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 11px;
+      color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .hero-tag::before {
+      content: ''; width: 24px; height: 1px; background: var(--accent);
+    }
+
+    h1 {
+      font-family: var(--display);
+      font-size: clamp(52px, 8vw, 88px);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 28px;
+    }
+
+    h1 .name-line { display: block; }
+    h1 .accent-word { color: var(--accent); }
+
+    .hero-desc {
+      font-size: 16px;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+    }
+
+    .hero-links {
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px;
+      border-radius: 6px;
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em;
+      text-decoration: none; cursor: pointer; border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent); color: #0A0D14; font-weight: 500;
+    }
+    .btn-primary:hover { background: #6AA3FF; transform: translateY(-1px); }
+
+    .btn-ghost {
+      background: transparent; color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    .hero-grid {
+      display: grid; grid-template-columns: 3fr 2fr; gap: 80px; align-items: center;
+    }
+
+    .hero-stats {
+      display: flex; flex-direction: column; gap: 24px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: var(--accent);
+    }
+    .stat-num {
+      font-family: var(--display);
+      font-size: 32px; font-weight: 800;
+      color: var(--text); line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stat-label {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    /* ── Section headers ──────────────────────────────────────────────────── */
+    .section-label {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--accent); letter-spacing: 0.14em; text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    h2 {
+      font-family: var(--display);
+      font-size: 36px; font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 48px;
+      color: var(--text);
+    }
+
+    /* ── Projects ─────────────────────────────────────────────────────────── */
+    #projects { background: var(--bg2); max-width: 100%; }
+    #projects > .inner { max-width: 1100px; margin: 0 auto; padding: 80px 40px; }
+
+    .projects-grid {
+      display: grid; grid-template-columns: 1fr;
+      gap: 2px;
+    }
+
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .project-card:hover { border-color: var(--accent); }
+
+    .project-header {
+      display: flex; align-items: flex-start;
+      justify-content: space-between;
+      padding: 28px 32px 0;
+      gap: 20px;
+    }
+
+    .project-num {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--faint); letter-spacing: 0.1em;
+    }
+
+    .project-title {
+      font-family: var(--display);
+      font-size: 22px; font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+
+    .project-subtitle {
+      font-size: 13px; color: var(--muted);
+      font-family: var(--mono);
+    }
+
+    .project-tags {
+      display: flex; flex-wrap: wrap; gap: 6px;
+      padding: 16px 32px;
+    }
+
+    .tag {
+      font-family: var(--mono); font-size: 10px;
+      padding: 3px 8px; border-radius: 4px;
+      background: var(--bg3); color: var(--muted);
+      border: 1px solid var(--border);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Demo panel ───────────────────────────────────────────────────────── */
+    .demo-panel {
+      margin: 0 32px 28px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .demo-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .demo-dots {
+      display: flex; gap: 6px;
+    }
+    .demo-dots span {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+    .d1 { background: #F76F6F; }
+    .d2 { background: #F79A4F; }
+    .d3 { background: var(--green); }
+
+    .demo-title {
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+    }
+
+    .demo-live-badge {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--green); letter-spacing: 0.06em;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .demo-live-badge::before {
+      content: ''; width: 5px; height: 5px; border-radius: 50%;
+      background: var(--green); box-shadow: 0 0 5px var(--green);
+    }
+
+    .demo-body { padding: 20px; }
+
+    /* Task Queue Demo */
+    .tq-form {
+      display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px;
+      margin-bottom: 16px; align-items: end;
+    }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+    .form-label {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase;
+    }
+
+    .form-input, .form-select {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-family: var(--mono); font-size: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+    .form-input:focus, .form-select:focus { border-color: var(--accent); }
+    .form-select option { background: var(--bg2); }
+
+    .btn-run {
+      background: var(--accent); color: #0A0D14;
+      border: none; border-radius: 6px;
+      padding: 8px 20px;
+      font-family: var(--mono); font-size: 12px; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-run:hover { background: #6AA3FF; }
+    .btn-run:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .demo-result {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      font-family: var(--mono); font-size: 11px;
+      color: var(--muted);
+      min-height: 56px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .result-line { display: flex; gap: 8px; margin-bottom: 2px; }
+    .result-key { color: var(--accent2); }
+    .result-val { color: var(--green); }
+    .result-pending { color: var(--orange); }
+    .result-error { color: var(--red); }
+
+    /* Storage Demo */
+    .storage-upload {
+      display: flex; gap: 10px; margin-bottom: 16px; align-items: center;
+    }
+
+    .file-input-label {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--bg2); border: 1px dashed var(--border);
+      border-radius: 6px; padding: 8px 16px;
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      cursor: pointer; transition: all 0.2s; flex: 1;
+    }
+    .file-input-label:hover { border-color: var(--accent); color: var(--accent); }
+    #fileInput { display: none; }
+
+    .file-list {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      min-height: 80px;
+    }
+
+    .file-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono); font-size: 11px;
+      animation: fadeIn 0.3s ease;
+    }
+    .file-row:last-child { border-bottom: none; }
+    .file-name { color: var(--text); }
+    .file-size { color: var(--muted); }
+    .file-actions { display: flex; gap: 8px; }
+
+    .btn-sm {
+      background: none; border: 1px solid var(--border);
+      border-radius: 4px; padding: 3px 10px;
+      font-family: var(--mono); font-size: 10px; color: var(--muted);
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-sm:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm.del:hover { border-color: var(--red); color: var(--red); }
+
+    .empty-state {
+      display: flex; align-items: center; justify-content: center;
+      height: 80px;
+      font-family: var(--mono); font-size: 11px; color: var(--faint);
+    }
+
+    /* Auth Demo */
+    .auth-tabs {
+      display: flex; gap: 2px; margin-bottom: 16px;
+      background: var(--bg2); border-radius: 6px; padding: 3px;
+      border: 1px solid var(--border);
+    }
+    .auth-tab {
+      flex: 1; padding: 7px; text-align: center;
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      border-radius: 4px; cursor: pointer; transition: all 0.2s;
+      border: none; background: none;
+    }
+    .auth-tab.active {
+      background: var(--surface); color: var(--text);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+
+    .auth-form { display: flex; flex-direction: column; gap: 10px; }
+    .auth-form .form-input { width: 100%; }
+
+    .token-display {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px;
+      font-family: var(--mono); font-size: 10px; color: var(--green);
+      word-break: break-all; line-height: 1.5;
+      margin-top: 10px;
+    }
+
+    /* ── API Config banner ────────────────────────────────────────────────── */
+    .api-config-bar {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--orange);
+      border-radius: 8px;
+      padding: 14px 20px;
+      margin-bottom: 40px;
+      display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .api-config-label {
+      font-family: var(--mono); font-size: 11px; color: var(--orange);
+      white-space: nowrap; letter-spacing: 0.06em;
+    }
+    .api-url-input {
+      flex: 1; min-width: 200px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 5px; padding: 7px 12px;
+      color: var(--text); font-family: var(--mono); font-size: 11px;
+      outline: none;
+    }
+    .api-url-input:focus { border-color: var(--orange); }
+
+    .api-save-btn {
+      background: var(--orange); color: #0A0D14;
+      border: none; border-radius: 5px;
+      padding: 7px 16px; font-family: var(--mono); font-size: 11px;
+      cursor: pointer; font-weight: 500;
+    }
+
+    /* ── Skills ───────────────────────────────────────────────────────────── */
+    .skills-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .skill-group {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 20px;
+    }
+
+    .skill-group-name {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .skill-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .skill-chip {
+      font-family: var(--mono); font-size: 10px;
+      padding: 3px 8px; border-radius: 4px;
+      background: var(--bg); color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Experience ───────────────────────────────────────────────────────── */
+    .exp-item {
+      border-left: 1px solid var(--border);
+      padding-left: 28px; padding-bottom: 40px;
+      position: relative;
+    }
+    .exp-item::before {
+      content: ''; position: absolute; left: -4px; top: 6px;
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--accent); border: 1px solid var(--bg);
+    }
+    .exp-item:last-child { padding-bottom: 0; }
+
+    .exp-role {
+      font-family: var(--display); font-size: 18px; font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .exp-company {
+      font-family: var(--mono); font-size: 12px; color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .exp-date {
+      font-family: var(--mono); font-size: 11px; color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .exp-desc { font-size: 14px; color: var(--muted); line-height: 1.7; }
+
+    /* ── Open source ──────────────────────────────────────────────────────── */
+    .oss-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 24px 28px;
+      display: flex; gap: 20px; align-items: flex-start;
+    }
+    .oss-icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      background: var(--bg3); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .oss-repo {
+      font-family: var(--mono); font-size: 13px; color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .oss-title {
+      font-family: var(--display); font-size: 17px; font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .oss-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .oss-pr {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 10px; font-family: var(--mono); font-size: 10px;
+      background: var(--bg3); border: 1px solid var(--green);
+      color: var(--green); padding: 3px 10px; border-radius: 4px;
+    }
+
+    /* ── Contact ──────────────────────────────────────────────────────────── */
+    #contact { border-top: 1px solid var(--border); }
+    .contact-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px;
+    }
+    .contact-links { display: flex; flex-direction: column; gap: 12px; }
+    .contact-link {
+      display: flex; align-items: center; gap: 14px;
+      text-decoration: none; color: var(--muted);
+      font-size: 14px; transition: color 0.2s;
+    }
+    .contact-link:hover { color: var(--text); }
+    .contact-link-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      background: var(--surface); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .contact-note {
+      font-size: 14px; color: var(--muted); line-height: 1.7;
+    }
+
+    /* ── Animations ───────────────────────────────────────────────────────── */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+
+    .fade-in { animation: fadeIn 0.6s ease both; }
+    .fade-in-2 { animation: fadeIn 0.6s 0.15s ease both; }
+    .fade-in-3 { animation: fadeIn 0.6s 0.3s ease both; }
+
+    /* ── Spinner ──────────────────────────────────────────────────────────── */
+    .spinner {
+      display: inline-block; width: 10px; height: 10px;
+      border: 1.5px solid var(--faint); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Scrollbar ────────────────────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ── Responsive ───────────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      section, #projects > .inner { padding: 60px 20px; }
+      .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+      .tq-form { grid-template-columns: 1fr; }
+      .contact-grid { grid-template-columns: 1fr; gap: 32px; }
+      h1 { font-size: 44px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Nav ──────────────────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-logo">shriram.dev</div>
+  <ul class="nav-links">
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#experience">experience</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <span class="status-dot"></span>
+    available for work
+  </div>
+</nav>
+
+<main>
+
+<!-- ── Hero ─────────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-tag fade-in">Backend Developer</div>
+      <h1 class="fade-in-2">
+        <span class="name-line">Shriram</span>
+        <span class="name-line accent-word">Thakare</span>
+      </h1>
+      <p class="hero-desc fade-in-3">
+        Building production-grade Python backends — task queues, file storage, auth systems.
+        Open source contributor to Keras (64k+ stars).
+        Electronics & Telecom student at VCET, Mumbai University.
+      </p>
+      <div class="hero-links fade-in-3">
+        <a href="https://github.com/shriramthakare3" target="_blank" class="btn btn-primary">
+          ↗ GitHub
+        </a>
+        <a href="https://leetcode.com/u/shriramthakare__/" target="_blank" class="btn btn-ghost">
+          LeetCode
+        </a>
+        <a href="mailto:shriramsthakare@gmail.com" class="btn btn-ghost">
+          Email
+        </a>
+      </div>
+    </div>
+    <div class="hero-stats fade-in-3">
+      <div class="stat-card">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Backend Projects Built</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">64k+</div>
+        <div class="stat-label">Stars — Keras (PR #22306 merged)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">4</div>
+        <div class="stat-label">Docker services per project</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Projects ──────────────────────────────────────────────────────────────── -->
+<div id="projects">
+<div class="inner">
+  <div class="section-label">Live Demos</div>
+  <h2>Projects</h2>
+
+  <!-- API Config -->
+  <div class="api-config-bar">
+    <span class="api-config-label">⚡ API BASE URL</span>
+    <input class="api-url-input" id="apiBaseUrl"
+      placeholder="https://your-railway-url.up.railway.app"
+      value="" />
+    <button class="api-save-btn" onclick="saveApiUrl()">Connect</button>
+    <span id="apiStatus" style="font-family:var(--mono);font-size:11px;color:var(--muted)"></span>
+  </div>
+
+  <div class="projects-grid">
+
+    <!-- Project 1: Task Queue -->
+    <div class="project-card">
+      <div class="project-header">
+        <div>
+          <div class="project-num">01 / 03</div>
+          <div class="project-title">Task Queue System</div>
+          <div class="project-subtitle">Mini Celery Clone — async background jobs</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="tag">FastAPI</span>
+        <span class="tag">PostgreSQL</span>
+        <span class="tag">SQLAlchemy</span>
+        <span class="tag">Docker</span>
+        <span class="tag">Nginx</span>
+        <span class="tag">Threading</span>
+        <span class="tag">SELECT FOR UPDATE SKIP LOCKED</span>
+      </div>
+      <div class="demo-panel">
+        <div class="demo-bar">
+          <div class="demo-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <div class="demo-title">Live Demo — Submit & Poll Tasks</div>
+          <div class="demo-live-badge">LIVE</div>
+        </div>
+        <div class="demo-body">
+          <div class="tq-form">
+            <div class="form-group">
+              <label class="form-label">Task Type</label>
+              <select class="form-select" id="tqTaskType" onchange="updateTQInputs()">
+                <option value="add">add — sum two numbers</option>
+                <option value="reverse">reverse — flip a string</option>
+                <option value="fibonacci">fibonacci — nth number</option>
+                <option value="word_count">word_count — count words</option>
+                <option value="sleep">sleep — background delay</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" id="tqInputLabel">Input (JSON)</label>
+              <input class="form-input" id="tqInput" value='{"a":21,"b":21}' placeholder='{"a":21,"b":21}' />
+            </div>
+            <button class="btn-run" id="tqRunBtn" onclick="submitTask()">▶ Run</button>
+          </div>
+          <div class="demo-result" id="tqResult">
+            <span style="color:var(--faint)">// Connect your API above, then run a task...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project 2: Cloud Storage -->
+    <div class="project-card">
+      <div class="project-header">
+        <div>
+          <div class="project-num">02 / 03</div>
+          <div class="project-title">Mini Cloud Storage</div>
+          <div class="project-subtitle">Google Drive-style file management API</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="tag">FastAPI</span>
+        <span class="tag">PostgreSQL</span>
+        <span class="tag">python-multipart</span>
+        <span class="tag">Docker</span>
+        <span class="tag">Nginx</span>
+        <span class="tag">File I/O</span>
+      </div>
+      <div class="demo-panel">
+        <div class="demo-bar">
+          <div class="demo-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <div class="demo-title">Live Demo — Upload & Manage Files</div>
+          <div class="demo-live-badge">LIVE</div>
+        </div>
+        <div class="demo-body">
+          <div class="storage-upload">
+            <label class="file-input-label" for="fileInput">
+              📁 Choose file to upload
+            </label>
+            <input type="file" id="fileInput" onchange="uploadFile()" />
+            <button class="btn-run" id="storageRefreshBtn" onclick="listFiles()" style="padding:8px 14px;">↻ Refresh</button>
+          </div>
+          <div class="file-list" id="fileList">
+            <div class="empty-state">// Connect API and upload a file...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Project 3: Auth Server -->
+    <div class="project-card">
+      <div class="project-header">
+        <div>
+          <div class="project-num">03 / 03</div>
+          <div class="project-title">Authentication Server</div>
+          <div class="project-subtitle">JWT — Register · Login · Refresh · RBAC</div>
+        </div>
+      </div>
+      <div class="project-tags">
+        <span class="tag">FastAPI</span>
+        <span class="tag">JWT</span>
+        <span class="tag">bcrypt</span>
+        <span class="tag">python-jose</span>
+        <span class="tag">slowapi</span>
+        <span class="tag">RBAC</span>
+        <span class="tag">Token Rotation</span>
+      </div>
+      <div class="demo-panel">
+        <div class="demo-bar">
+          <div class="demo-dots"><span class="d1"></span><span class="d2"></span><span class="d3"></span></div>
+          <div class="demo-title">Live Demo — Register & Login</div>
+          <div class="demo-live-badge">LIVE</div>
+        </div>
+        <div class="demo-body">
+          <div class="auth-tabs">
+            <button class="auth-tab active" onclick="switchAuthTab('register', this)">Register</button>
+            <button class="auth-tab" onclick="switchAuthTab('login', this)">Login</button>
+            <button class="auth-tab" onclick="switchAuthTab('me', this)">Profile /me</button>
+          </div>
+          <div id="authRegister" class="auth-form">
+            <input class="form-input" id="regUsername" placeholder="username" />
+            <input class="form-input" id="regEmail" placeholder="email@example.com" type="email" />
+            <input class="form-input" id="regPassword" placeholder="password (min 8 chars)" type="password" />
+            <button class="btn-run" onclick="authRegister()">▶ Register</button>
+          </div>
+          <div id="authLogin" class="auth-form" style="display:none">
+            <input class="form-input" id="loginUsername" placeholder="username or email" />
+            <input class="form-input" id="loginPassword" placeholder="password" type="password" />
+            <button class="btn-run" onclick="authLogin()">▶ Login</button>
+          </div>
+          <div id="authMe" class="auth-form" style="display:none">
+            <p style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:8px;">
+              Uses the access token from your last login/register.
+            </p>
+            <button class="btn-run" onclick="authMe()">▶ GET /users/me</button>
+          </div>
+          <div class="demo-result" id="authResult" style="margin-top:12px;">
+            <span style="color:var(--faint)">// Connect API above, then try register...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ── Skills ─────────────────────────────────────────────────────────────────── -->
+<section id="skills">
+  <div class="section-label">Stack</div>
+  <h2>Skills</h2>
+  <div class="skills-grid">
+    <div class="skill-group">
+      <div class="skill-group-name">Backend</div>
+      <div class="skill-chips">
+        <span class="skill-chip">Python</span>
+        <span class="skill-chip">FastAPI</span>
+        <span class="skill-chip">Gunicorn</span>
+        <span class="skill-chip">REST APIs</span>
+        <span class="skill-chip">JWT</span>
+        <span class="skill-chip">bcrypt</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-name">Database</div>
+      <div class="skill-chips">
+        <span class="skill-chip">PostgreSQL</span>
+        <span class="skill-chip">SQLAlchemy ORM</span>
+        <span class="skill-chip">MySQL</span>
+        <span class="skill-chip">SQL</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-name">DevOps</div>
+      <div class="skill-chips">
+        <span class="skill-chip">Docker</span>
+        <span class="skill-chip">Docker Compose</span>
+        <span class="skill-chip">Nginx</span>
+        <span class="skill-chip">Multi-stage builds</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-name">Tools</div>
+      <div class="skill-chips">
+        <span class="skill-chip">Git</span>
+        <span class="skill-chip">GitHub</span>
+        <span class="skill-chip">Linux CLI</span>
+        <span class="skill-chip">VS Code</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="skill-group-name">Other</div>
+      <div class="skill-chips">
+        <span class="skill-chip">Qiskit</span>
+        <span class="skill-chip">ESP32</span>
+        <span class="skill-chip">PEP 8</span>
+        <span class="skill-chip">Agile</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Experience ─────────────────────────────────────────────────────────────── -->
+<section id="experience" style="background:var(--bg2);max-width:100%;padding:0;">
+<div style="max-width:1100px;margin:0 auto;padding:80px 40px;">
+  <div class="section-label">Background</div>
+  <h2>Experience & Education</h2>
+
+  <div class="exp-item">
+    <div class="exp-role">Python Developer</div>
+    <div class="exp-company">Next24Tech</div>
+    <div class="exp-date">June 2024 – August 2024 · Remote</div>
+    <div class="exp-desc">
+      Developed and deployed Python automation scripts following PEP 8 standards.
+      Managed source control with Git/GitHub, conducted code reviews in an Agile team,
+      and maintained technical documentation for all deliverables.
+    </div>
+  </div>
+
+  <div class="exp-item" style="margin-top:32px;">
+    <div class="exp-role">Open Source Contributor</div>
+    <div class="exp-company">Keras — keras-team/keras (64k+ ⭐)</div>
+    <div class="exp-date">March 2026</div>
+    <div class="exp-desc">
+      Fixed a bug in <code style="font-family:var(--mono);color:var(--accent2);font-size:12px;">is_continuous_axis</code>
+      where descending axis sequences were misclassified. Replaced a two-pass loop with a
+      single-pass algorithm. PR #22306 merged after multiple reviewer cycles.
+    </div>
+    <div class="oss-pr">✓ PR #22306 merged into master</div>
+  </div>
+
+  <div class="exp-item" style="margin-top:32px;">
+    <div class="exp-role">B.E. Electronics & Telecommunication</div>
+    <div class="exp-company">Vidyavardhini's College of Engineering — Mumbai University</div>
+    <div class="exp-date">2022 – 2026 (Pursuing)</div>
+  </div>
+</div>
+</section>
+
+<!-- ── Contact ────────────────────────────────────────────────────────────────── -->
+<section id="contact">
+  <div class="section-label">Get in touch</div>
+  <h2>Contact</h2>
+  <div class="contact-grid">
+    <div class="contact-links">
+      <a href="mailto:shriramsthakare@gmail.com" class="contact-link">
+        <div class="contact-link-icon">✉</div>
+        shriramsthakare@gmail.com
+      </a>
+      <a href="tel:+917499983074" class="contact-link">
+        <div class="contact-link-icon">📞</div>
+        +91 7499983074
+      </a>
+      <a href="https://github.com/shriramthakare3" target="_blank" class="contact-link">
+        <div class="contact-link-icon">⌥</div>
+        github.com/shriramthakare3
+      </a>
+      <a href="https://leetcode.com/u/shriramthakare__/" target="_blank" class="contact-link">
+        <div class="contact-link-icon">◈</div>
+        LeetCode — shriramthakare__
+      </a>
+    </div>
+    <div>
+      <p class="contact-note">
+        Open to backend development roles, internships, and freelance projects.
+        Based in Vasai, Maharashtra — available remotely.
+        <br/><br/>
+        Currently building: backend systems with Python, FastAPI, and PostgreSQL.
+        Interested in distributed systems, API design, and developer tooling.
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ── JavaScript ──────────────────────────────────────────────────────────────── -->
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let API_BASE = localStorage.getItem('apiBase') || '';
+  let authToken = '';
+  let tqPollInterval = null;
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    if (API_BASE) {
+      document.getElementById('apiBaseUrl').value = API_BASE;
+      checkApiHealth();
+    }
+    updateTQInputs();
+  });
+
+  // ── API Config ─────────────────────────────────────────────────────────────
+  function saveApiUrl() {
+    const val = document.getElementById('apiBaseUrl').value.trim().replace(/\/$/, '');
+    API_BASE = val;
+    localStorage.setItem('apiBase', val);
+    checkApiHealth();
+  }
+
+  async function checkApiHealth() {
+    const el = document.getElementById('apiStatus');
+    el.textContent = 'checking...';
+    try {
+      const r = await fetch(`${API_BASE}/health`);
+      const d = await r.json();
+      el.textContent = `✓ connected — db:${d.db}`;
+      el.style.color = 'var(--green)';
+    } catch(e) {
+      el.textContent = '✗ unreachable';
+      el.style.color = 'var(--red)';
+    }
+  }
+
+  // ── Task Queue Demo ─────────────────────────────────────────────────────────
+  const TQ_DEFAULTS = {
+    add:        '{"a": 21, "b": 21}',
+    reverse:    '{"text": "Hello World"}',
+    fibonacci:  '{"n": 10}',
+    word_count: '{"text": "the quick brown fox"}',
+    sleep:      '{"seconds": 2}',
+  };
+
+  const TQ_LABELS = {
+    add:        'Input — {a, b}',
+    reverse:    'Input — {text}',
+    fibonacci:  'Input — {n}',
+    word_count: 'Input — {text}',
+    sleep:      'Input — {seconds}',
+  };
+
+  function updateTQInputs() {
+    const type = document.getElementById('tqTaskType').value;
+    document.getElementById('tqInput').value = TQ_DEFAULTS[type];
+    document.getElementById('tqInputLabel').textContent = TQ_LABELS[type];
+  }
+
+  async function submitTask() {
+    if (!API_BASE) { showTQResult('error', '// Set your API URL above first'); return; }
+    const btn = document.getElementById('tqRunBtn');
+    const type = document.getElementById('tqTaskType').value;
+    let input;
+    try { input = JSON.parse(document.getElementById('tqInput').value); }
+    catch(e) { showTQResult('error', '// Invalid JSON input'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>';
+    showTQResult('pending', '// Submitting task...');
+
+    try {
+      const r = await fetch(`${API_BASE}/tasks`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: type, input_data: input, priority: 5 })
+      });
+      const task = await r.json();
+      if (!r.ok) throw new Error(task.detail || JSON.stringify(task));
+
+      showTQResult('pending', `// Task submitted\n// id: ${task.id}\n// status: pending — polling...`);
+      pollTask(task.id, btn);
+    } catch(e) {
+      btn.disabled = false; btn.textContent = '▶ Run';
+      showTQResult('error', `// Error: ${e.message}`);
+    }
+  }
+
+  async function pollTask(id, btn) {
+    let attempts = 0;
+    const maxAttempts = 30;
+    const interval = setInterval(async () => {
+      attempts++;
+      try {
+        const r = await fetch(`${API_BASE}/tasks/${id}/result`);
+        const d = await r.json();
+        if (d.status === 'done') {
+          clearInterval(interval);
+          btn.disabled = false; btn.textContent = '▶ Run';
+          let result = d.result;
+          try { result = JSON.stringify(JSON.parse(d.result), null, 2); } catch(e){}
+          showTQResult('done', `// ✓ Task completed\n// status: done\n\n${result}`);
+        } else if (d.status === 'failed') {
+          clearInterval(interval);
+          btn.disabled = false; btn.textContent = '▶ Run';
+          showTQResult('error', `// ✗ Task failed\n// error: ${d.error}`);
+        } else if (attempts >= maxAttempts) {
+          clearInterval(interval);
+          btn.disabled = false; btn.textContent = '▶ Run';
+          showTQResult('error', `// Timeout — task still running\n// Check: GET /tasks/${id}/result`);
+        }
+      } catch(e) {
+        clearInterval(interval);
+        btn.disabled = false; btn.textContent = '▶ Run';
+        showTQResult('error', `// Poll error: ${e.message}`);
+      }
+    }, 1000);
+  }
+
+  function showTQResult(type, text) {
+    const el = document.getElementById('tqResult');
+    const colors = { done: 'var(--green)', error: 'var(--red)', pending: 'var(--orange)' };
+    el.style.color = colors[type] || 'var(--muted)';
+    el.textContent = text;
+  }
+
+  // ── Storage Demo ────────────────────────────────────────────────────────────
+  async function uploadFile() {
+    if (!API_BASE) { return; }
+    const input = document.getElementById('fileInput');
+    if (!input.files.length) return;
+    const file = input.files[0];
+    const form = new FormData();
+    form.append('file', file);
+
+    try {
+      const r = await fetch(`${API_BASE}/files/upload`, { method: 'POST', body: form });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || 'Upload failed');
+      listFiles();
+    } catch(e) {
+      alert(`Upload failed: ${e.message}`);
+    }
+    input.value = '';
+  }
+
+  async function listFiles() {
+    if (!API_BASE) return;
+    try {
+      const r = await fetch(`${API_BASE}/files?limit=20`);
+      const d = await r.json();
+      renderFileList(d.files || []);
+    } catch(e) {
+      document.getElementById('fileList').innerHTML =
+        `<div class="empty-state" style="color:var(--red)">// Cannot reach API</div>`;
+    }
+  }
+
+  function renderFileList(files) {
+    const el = document.getElementById('fileList');
+    if (!files.length) {
+      el.innerHTML = '<div class="empty-state">// No files yet — upload one above</div>';
+      return;
+    }
+    el.innerHTML = files.map(f => `
+      <div class="file-row">
+        <span class="file-name">📄 ${escHtml(f.filename)}</span>
+        <span class="file-size">${formatBytes(f.size)}</span>
+        <div class="file-actions">
+          <button class="btn-sm" onclick="downloadFile('${f.id}','${escHtml(f.filename)}')">↓</button>
+          <button class="btn-sm del" onclick="deleteFile('${f.id}')">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  async function downloadFile(id, name) {
+    if (!API_BASE) return;
+    const a = document.createElement('a');
+    a.href = `${API_BASE}/files/${id}`;
+    a.download = name;
+    a.click();
+  }
+
+  async function deleteFile(id) {
+    if (!API_BASE) return;
+    try {
+      await fetch(`${API_BASE}/files/${id}`, { method: 'DELETE' });
+      listFiles();
+    } catch(e) { alert('Delete failed'); }
+  }
+
+  // ── Auth Demo ───────────────────────────────────────────────────────────────
+  function switchAuthTab(tab, btn) {
+    document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('authRegister').style.display = tab === 'register' ? 'flex' : 'none';
+    document.getElementById('authLogin').style.display    = tab === 'login'    ? 'flex' : 'none';
+    document.getElementById('authMe').style.display       = tab === 'me'       ? 'flex' : 'none';
+    document.getElementById('authResult').innerHTML =
+      '<span style="color:var(--faint)">// Ready...</span>';
+  }
+
+  async function authRegister() {
+    if (!API_BASE) { showAuthResult('error', '// Set API URL first'); return; }
+    const body = {
+      username: document.getElementById('regUsername').value.trim(),
+      email:    document.getElementById('regEmail').value.trim(),
+      password: document.getElementById('regPassword').value,
+    };
+    if (!body.username || !body.email || !body.password) {
+      showAuthResult('error', '// Fill in all fields'); return;
+    }
+    try {
+      const r = await fetch(`${API_BASE}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || JSON.stringify(d));
+      authToken = d.access_token;
+      showAuthResult('done',
+        `// ✓ Registered successfully!\n// access_token (saved):\n${d.access_token.substring(0,60)}...\n// expires_in: ${d.expires_in}s`);
+    } catch(e) { showAuthResult('error', `// Error: ${e.message}`); }
+  }
+
+  async function authLogin() {
+    if (!API_BASE) { showAuthResult('error', '// Set API URL first'); return; }
+    const body = {
+      username: document.getElementById('loginUsername').value.trim(),
+      password: document.getElementById('loginPassword').value,
+    };
+    try {
+      const r = await fetch(`${API_BASE}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || JSON.stringify(d));
+      authToken = d.access_token;
+      showAuthResult('done',
+        `// ✓ Logged in!\n// access_token (saved for /me):\n${d.access_token.substring(0,60)}...\n// expires_in: ${d.expires_in}s`);
+    } catch(e) { showAuthResult('error', `// Error: ${e.message}`); }
+  }
+
+  async function authMe() {
+    if (!API_BASE) { showAuthResult('error', '// Set API URL first'); return; }
+    if (!authToken) { showAuthResult('error', '// Login or register first to get a token'); return; }
+    try {
+      const r = await fetch(`${API_BASE}/users/me`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail || JSON.stringify(d));
+      showAuthResult('done',
+        `// ✓ Profile fetched\n\n${JSON.stringify(d, null, 2)}`);
+    } catch(e) { showAuthResult('error', `// Error: ${e.message}`); }
+  }
+
+  function showAuthResult(type, text) {
+    const el = document.getElementById('authResult');
+    const colors = { done: 'var(--green)', error: 'var(--red)', pending: 'var(--orange)' };
+    el.style.color = colors[type] || 'var(--muted)';
+    el.textContent = text;
+  }
+
+  // ── Helpers ─────────────────────────────────────────────────────────────────
+  function formatBytes(b) {
+    if (b < 1024) return `${b} B`;
+    if (b < 1048576) return `${(b/1024).toFixed(1)} KB`;
+    return `${(b/1048576).toFixed(1)} MB`;
+  }
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+
+</body>
+</html>

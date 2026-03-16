@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#fafafa;--surface:#fff;--border:#e8e8e8;--border2:#d4d4d4;
+  --text:#3b3b3b;--muted:#6f6f6f;--light:#a0a0a0;
+  --get:#0d6aad;--get-bg:#e8f3fb;--get-bdr:#b6d9f0;
+  --post:#1a7a4a;--post-bg:#e8f7f0;--post-bdr:#9dd8bb;
+  --del:#c0392b;--del-bg:#fdf0ef;--del-bdr:#f0b8b3;
+  --patch:#7d5a00;--patch-bg:#fdf7e8;--patch-bdr:#e8d496;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.5;}
+a{color:#1a56db;text-decoration:none;}a:hover{text-decoration:underline;}
+/* top bar */
+.topbar{background:#1a1a18;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{color:#fff;font-family:var(--mono);font-size:13px;font-weight:600;}
+.topbar-back{color:#9b9b94;font-family:var(--mono);font-size:11px;text-decoration:none;}
+.topbar-back:hover{color:#fff;text-decoration:none;}
+/* info block */
+.info-block{background:var(--surface);border-bottom:1px solid var(--border);padding:24px 32px;}
+.api-title{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.api-version{display:inline-block;font-family:var(--mono);font-size:11px;background:#e0e0e0;color:#555;padding:2px 8px;border-radius:10px;margin-bottom:12px;}
+.api-desc{font-size:13px;color:var(--muted);max-width:640px;line-height:1.6;margin-bottom:16px;}
+.base-url{font-family:var(--mono);font-size:12px;color:var(--muted);}
+.base-url span{color:var(--text);}
+/* section */
+.section{margin:16px 24px;}
+.section-tag{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);background:#f0f0f0;border:1px solid var(--border);border-radius:4px 4px 0 0;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;}
+.section-tag:hover{background:#e8e8e8;}
+.section-body{border:1px solid var(--border);border-top:none;border-radius:0 0 4px 4px;overflow:hidden;}
+/* endpoint row */
+.ep{border-bottom:1px solid var(--border);overflow:hidden;}
+.ep:last-child{border-bottom:none;}
+.ep-header{display:flex;align-items:center;gap:12px;padding:10px 16px;cursor:pointer;transition:background 0.1s;}
+.ep-header:hover{background:#f8f8f8;}
+.ep.open .ep-header{border-bottom:1px solid var(--border);}
+.method{font-family:var(--mono);font-size:11px;font-weight:600;padding:3px 10px;border-radius:3px;min-width:64px;text-align:center;}
+.GET   {color:var(--get);background:var(--get-bg);border:1px solid var(--get-bdr);}
+.POST  {color:var(--post);background:var(--post-bg);border:1px solid var(--post-bdr);}
+.DELETE{color:var(--del);background:var(--del-bg);border:1px solid var(--del-bdr);}
+.PATCH {color:var(--patch);background:var(--patch-bg);border:1px solid var(--patch-bdr);}
+.ep-path{font-family:var(--mono);font-size:13px;color:var(--text);}
+.ep-summary{font-size:13px;color:var(--muted);margin-left:auto;}
+.ep-body{background:#fafafa;padding:20px 24px;display:none;}
+.ep.open .ep-body{display:block;}
+/* params/body tables */
+.ep-section-label{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--light);margin-bottom:10px;margin-top:16px;}
+.ep-section-label:first-child{margin-top:0;}
+.params-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:8px;}
+.params-table th{text-align:left;font-family:var(--mono);font-size:10px;font-weight:600;color:var(--light);text-transform:uppercase;letter-spacing:0.08em;padding:6px 12px;background:#f0f0f0;border:1px solid var(--border);}
+.params-table td{padding:8px 12px;border:1px solid var(--border);background:#fff;vertical-align:top;}
+.params-table td:first-child{font-family:var(--mono);font-size:12px;color:var(--text);}
+.required{color:var(--del);font-size:10px;margin-left:4px;}
+.type-badge{font-family:var(--mono);font-size:10px;background:#f0f0f0;color:var(--muted);padding:1px 6px;border-radius:3px;}
+.code-block{background:#1e1e1e;color:#d4d4d4;font-family:var(--mono);font-size:12px;padding:14px 16px;border-radius:4px;line-height:1.6;overflow-x:auto;margin-top:4px;}
+.code-block .k{color:#9cdcfe;}
+.code-block .s{color:#ce9178;}
+.code-block .n{color:#b5cea8;}
+.code-block .c{color:#6a9955;}
+/* responses */
+.response-row{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.response-row:last-child{border-bottom:none;}
+.resp-code{font-family:var(--mono);font-size:12px;font-weight:600;min-width:48px;}
+.resp-200{color:var(--post);}
+.resp-201{color:var(--post);}
+.resp-204{color:var(--post);}
+.resp-400{color:var(--patch);}
+.resp-401{color:var(--del);}
+.resp-404{color:var(--del);}
+.resp-413{color:var(--del);}
+.resp-desc{font-size:13px;color:var(--muted);}
+/* notice */
+.static-notice{background:#fffbeb;border:1px solid #f0d060;border-radius:4px;padding:10px 16px;font-size:12px;color:#7a5c00;margin-bottom:16px;font-family:var(--mono);}
+</style>
+</head>
+<body>
+<title>Mini Cloud Storage API — API Docs</title>
+<div class="topbar">
+  <span class="topbar-title">Mini Cloud Storage API</span>
+  <a class="topbar-back" href="../index.html">← Back to Portfolio</a>
+</div>
+<div class="info-block">
+  <div class="api-title">Mini Cloud Storage API</div>
+  <span class="api-version">1.0.0</span>
+  <div class="api-desc">Google Drive-style file storage backend. Upload files via multipart/form-data, organise into virtual folders, search by name, rename, and download by ID. Files live on disk; metadata in PostgreSQL.</div>
+  <div class="base-url">Base URL: <span>http://localhost/</span> · <span style="color:#a0a0a0">Run locally with Docker Compose · <code style="font-family:var(--mono)">docker compose up --build</code></span></div>
+</div>
+<div class="section">
+  <div class="section-tag">files — upload, download, manage<span class="arrow">▼</span></div>
+  <div class="section-body"><div class="ep">
+  <div class="ep-header">
+    <span class="method POST">POST</span>
+    <span class="ep-path">/files/upload</span>
+    <span class="ep-summary">Upload a file</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Parameters</div><table class='params-table'><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>folder_id<span class='required'></span></td><td><span class='type-badge'>string</span></td><td>(optional) Target folder UUID. Omit for root.</td></tr></table><div class='ep-section-label'>Request Body</div><div class='code-block'><span class="c">// multipart/form-data</span>
+<span class="k">file</span>: &lt;binary&gt;    <span class="c">// required — max 100 MB</span></div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-201'>201</span><span class='resp-desc'>File metadata: id, filename, size, content_type, folder_id, created_at.</span></div><div class='response-row'><span class='resp-code resp-400'>400</span><span class='resp-desc'>Empty file.</span></div><div class='response-row'><span class='resp-code resp-404'>404</span><span class='resp-desc'>Folder not found.</span></div><div class='response-row'><span class='resp-code resp-413'>413</span><span class='resp-desc'>File exceeds 100 MB limit.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method GET">GET</span>
+    <span class="ep-path">/files</span>
+    <span class="ep-summary">List files</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Parameters</div><table class='params-table'><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>search<span class='required'></span></td><td><span class='type-badge'>string</span></td><td>Case-insensitive filename substring match</td></tr><tr><td>folder_id<span class='required'></span></td><td><span class='type-badge'>string</span></td><td>Filter by folder. Use 'none' for root-level only.</td></tr><tr><td>page<span class='required'></span></td><td><span class='type-badge'>integer</span></td><td>Page (default: 1)</td></tr><tr><td>limit<span class='required'></span></td><td><span class='type-badge'>integer</span></td><td>Per page (default: 20, max: 100)</td></tr></table><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{ total, page, limit, files: [...] }</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method GET">GET</span>
+    <span class="ep-path">/files/{id}</span>
+    <span class="ep-summary">Download a file</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Parameters</div><table class='params-table'><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>id<span class='required'>*</span></td><td><span class='type-badge'>string</span></td><td>File UUID</td></tr></table><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>Binary file stream. Content-Disposition: attachment.</span></div><div class='response-row'><span class='resp-code resp-404'>404</span><span class='resp-desc'>Not found.</span></div><div class='response-row'><span class='resp-code resp-410'>410</span><span class='resp-desc'>Record exists but file missing from disk.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method DELETE">DELETE</span>
+    <span class="ep-path">/files/{id}</span>
+    <span class="ep-summary">Delete a file</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Parameters</div><table class='params-table'><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>id<span class='required'>*</span></td><td><span class='type-badge'>string</span></td><td>File UUID</td></tr></table><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-204'>204</span><span class='resp-desc'>DB record deleted and bytes removed from disk.</span></div><div class='response-row'><span class='resp-code resp-404'>404</span><span class='resp-desc'>Not found.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method PATCH">PATCH</span>
+    <span class="ep-path">/files/{id}/rename</span>
+    <span class="ep-summary">Rename a file</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Parameters</div><table class='params-table'><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>id<span class='required'>*</span></td><td><span class='type-badge'>string</span></td><td>File UUID</td></tr></table><div class='ep-section-label'>Request Body</div><div class='code-block'>{ <span class="k">"filename"</span>: <span class="s">"new-name.pdf"</span> }</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>Updated file object.</span></div><div class='response-row'><span class='resp-code resp-404'>404</span><span class='resp-desc'>Not found.</span></div></div>
+</div></div>
+</div><div class="section">
+  <div class="section-tag">folders — virtual folder hierarchy<span class="arrow">▼</span></div>
+  <div class="section-body"><div class="ep">
+  <div class="ep-header">
+    <span class="method POST">POST</span>
+    <span class="ep-path">/folders</span>
+    <span class="ep-summary">Create a folder</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Request Body</div><div class='code-block'>{
+  <span class="k">"name"</span>: <span class="s">"Documents"</span>,
+  <span class="k">"parent_id"</span>: <span class="s">"uuid..."</span>  <span class="c">// optional — omit for top-level</span>
+}</div><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-201'>201</span><span class='resp-desc'>Folder object with id, name, parent_id.</span></div><div class='response-row'><span class='resp-code resp-404'>404</span><span class='resp-desc'>Parent folder not found.</span></div></div>
+</div><div class="ep">
+  <div class="ep-header">
+    <span class="method GET">GET</span>
+    <span class="ep-path">/folders</span>
+    <span class="ep-summary">List folders</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Parameters</div><table class='params-table'><tr><th>Name</th><th>Type</th><th>Description</th></tr><tr><td>parent_id<span class='required'></span></td><td><span class='type-badge'>string</span></td><td>Filter by parent. Omit = top-level only. 'all' = every folder.</td></tr></table><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>Array of folder objects.</span></div></div>
+</div></div>
+</div><div class="section">
+  <div class="section-tag">system<span class="arrow">▼</span></div>
+  <div class="section-body"><div class="ep">
+  <div class="ep-header">
+    <span class="method GET">GET</span>
+    <span class="ep-path">/health</span>
+    <span class="ep-summary">Liveness + DB check</span>
+  </div>
+  <div class="ep-body"><div class='ep-section-label'>Responses</div><div class='response-row'><span class='resp-code resp-200'>200</span><span class='resp-desc'>{"status":"ok","db":"ok","version":"1.0.0"}</span></div></div>
+</div></div>
+</div>
+
+<script>
+document.querySelectorAll('.ep-header').forEach(h=>{
+  h.addEventListener('click',()=>{
+    h.closest('.ep').classList.toggle('open');
+  });
+});
+document.querySelectorAll('.section-tag').forEach(t=>{
+  t.addEventListener('click',()=>{
+    const body=t.nextElementSibling;
+    body.style.display=body.style.display==='none'?'':'none';
+    t.querySelector('.arrow').textContent=body.style.display==='none'?'▶':'▼';
+  });
+});
+</script>
+</body></html>
